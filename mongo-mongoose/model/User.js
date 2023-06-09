@@ -1,0 +1,15 @@
+import mongoose from 'mongoose';
+
+const {Schema, model } = mongoose;
+
+const userSchema = new Schema({
+	username: String,
+	password: String,
+	bio: String,
+	createdAt: Date,
+	updatedAt: Date,
+})
+
+const User = model('User', userSchema)
+
+export default User;
