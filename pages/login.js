@@ -6,31 +6,31 @@ import React, { useState } from 'react'
 
 export default function Login() {
 
-const sendCredentials = async (e) => {
+  const sendCredentials = async (e) => {
     e.preventDefault()
-  console.log(email, password)
-  let result = await fetch(
-    'http://localhost:3001/authenticate', {
-    method: "post",
-    body: JSON.stringify({ email, password }),
-    headers: {
-      'Content-Type': 'application/json'
+    console.log(email, password)
+    let result = await fetch(
+      'http://localhost:3001/authenticate', {
+      method: "post",
+      body: JSON.stringify({ email, password }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    )
+    result = await result.json();
+    console.warn(result)
+    if (result) {
+      alert("User has been authenticated")
+      setEmail("")
+      setPassword("")
+      localStorage.setItem('jwt', result.token)
+      window.location.href = "http://localhost:3000/profile"
     }
   }
-  )
-  result = await result.json();
-  console.warn(result)
-  if (result) {
-    alert("User has been authenticated")
-    setEmail("")
-    setPassword("")
-    // window.location.href = "http://localhost:3000/"
-    localStorage.setItem('jwt', result.token)
-  }
-}
 
-const [email, setEmail] = useState("")
-const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">

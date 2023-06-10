@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react"
-
+import Navbar from "@/components/navbar"
 
 const Profile = () => {
 
@@ -31,7 +31,7 @@ const Profile = () => {
 
 
   return (
-    <div>Hello {user.username}</div>
+    <Navbar user={{ user }} />
   )
 }
 
