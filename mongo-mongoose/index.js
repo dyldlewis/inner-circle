@@ -5,11 +5,12 @@ import User from './model/User.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
+import { v4 as uuidv4 } from 'uuid';
 
 const dbUser = process.env.MONGO_DB_USER
 const dbPass = process.env.MONGO_DB_PASSWORD
 
-const uri = `mongodb+srv://${dbUser}:${dbPass}@cluster0.alr3n8g.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${dbUser}:${dbPass}@cluster0.alr3n8g.mongodb.net/?retryWrites=true&w=majority`
 mongoose.connect(uri)
 
 const app = express();
@@ -20,9 +21,7 @@ app.use(cors({
 }));
 
 app.use(express.json())
-
 app.use(express.urlencoded({ extended: true }));
-
 const port = 3001;
 
 app.get('/', (req, res) => {
@@ -33,7 +32,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/sign-up', async (req, res) => {
-  
+
   const password = req.body.password
   const username = req.body.email
 
@@ -42,10 +41,12 @@ app.post('/sign-up', async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt)
 
   const user = new User({
+    id: uuidv4(),
     username: username,
     password: hashedPassword,
     bio: "",
   })
+
   const result = {
     serverStatus: "user has been created"
   }
@@ -57,15 +58,17 @@ app.post('/authenticate', async (req, res) => {
 
   const password = req.body.password
   const username = req.body.email
-  
+
   const user = await User.findOne({ username: username })
-  
+
   if (user) {
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (passwordMatch) {
+      console.log(user)
       const userToken = {
         username: user.username,
         bio: user.bio,
+        id: user.id
       }
       const token = jwt.sign(userToken, process.env.JWT_SECRET)
       res.json({ token })
@@ -78,8 +81,21 @@ app.post('/authenticate', async (req, res) => {
   }
 })
 
+app.get('/profile', async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1]
+  try {
+    const dt = jwt.verify(token, process.env.JWT_SECRET)
+    const user = {
+      id: dt.id,
+      username: dt.username,
+      bio: dt.bio,
+    }
+    res.send(user)
+  } catch (err) {
+    res.sendStatus(401)
+  }
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
-

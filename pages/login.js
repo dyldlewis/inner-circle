@@ -24,10 +24,10 @@ const sendCredentials = async (e) => {
     alert("User has been authenticated")
     setEmail("")
     setPassword("")
-    window.location.href = "http://localhost:3000/"
+    // window.location.href = "http://localhost:3000/"
+    localStorage.setItem('jwt', result.token)
   }
 }
-
 
 const [email, setEmail] = useState("")
 const [password, setPassword] = useState("")
