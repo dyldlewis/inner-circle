@@ -28,7 +28,11 @@ export default function SignUp() {
       alert("Data saved successfully")
       setEmail("")
       setPassword("")
+
+      window.location.href = '/login'
     }
+
+
   }
 
 
@@ -75,7 +79,7 @@ export default function SignUp() {
             />
           </div>
           <div className="mt-2">
-            <button  className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-lime-600 rounded-md hover:bg-lime-500 focus:outline-none focus:bg-lime-600"
+            <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-lime-600 rounded-md hover:bg-lime-500 focus:outline-none focus:bg-lime-600"
               onClick={handleOnSubmit}
             >
               Create Account

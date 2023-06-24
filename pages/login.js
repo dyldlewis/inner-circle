@@ -25,7 +25,7 @@ export default function Login() {
       setEmail("")
       setPassword("")
       localStorage.setItem('jwt', result.token)
-      window.location.href = "http://localhost:3000/profile"
+      window.location.href = '/profile'
     }
   }
 
