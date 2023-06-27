@@ -1,11 +1,33 @@
 'use client'
 import './globals.css'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '@/components/navbar'
 import Link from 'next/link'
 import Image from 'next/image'
 
 const Home = () => {
+
+    const [feed, setFeed] = useState([])
+    console.log(feed)
+
+    const getFeed = async () => {
+        let result = await fetch(
+            'http://localhost:3001/home', {
+            method: "get",
+        }
+        )
+        result = await result.json();
+        const keyResults = result.keys
+        return keyResults
+    }
+
+    useEffect(() => {
+        const grabKeys = async () => {
+            const getKeys = await getFeed()
+            setFeed(getKeys)
+        }
+       grabKeys() 
+    }, [])
 
 
     return (
@@ -41,7 +63,12 @@ const Home = () => {
                     </Link>
                 </div>
             </nav>
+            {
 
+                feed.map((photo, index) => (
+                    <img src={`https://inner-circle-project.s3.us-west-2.amazonaws.com/${photo}`} id={index} />
+                ))
+            }
             <Navbar />
         </div>
 

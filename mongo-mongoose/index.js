@@ -2,10 +2,18 @@ import mongoose from 'mongoose'
 import cors from 'cors'
 import express from 'express'
 import User from './model/User.js'
+import Post from './model/Post.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import { v4 as uuidv4 } from 'uuid';
+import multer from 'multer'
+import { uploadFile, getFileStream } from './s3.js'
+import fs from 'fs'
+import util from 'util'
+
+const unlinkFile = util.promisify(fs.unlink)
+
 
 const dbUser = process.env.MONGO_DB_USER
 const dbPass = process.env.MONGO_DB_PASSWORD
@@ -90,10 +98,55 @@ app.get('/profile', async (req, res) => {
       username: dt.username,
       bio: dt.bio,
     }
-    res.send(user)
   } catch (err) {
     res.sendStatus(401)
   }
+})
+//upload logic
+
+const upload = multer({ dest: 'post/' })
+
+app.post('/upload', upload.single('image'), async (req, res) => {
+  const file = req.file
+  const result = await uploadFile(file)
+  console.log(result)
+  await unlinkFile(file.path)
+
+  const token = req.headers.authorization.split(' ')[1]
+
+  try {
+    const dt = jwt.verify(token, process.env.JWT_SECRET)
+    const user = {
+      id: dt.id,
+      username: dt.username,
+      bio: dt.bio,
+    }
+    const post = new Post({
+      id: uuidv4(),
+      userId: user.id,
+      username: user.username,
+      imageKey: result.Key, 
+      caption: "",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+
+    })
+    await post.save();
+  } catch (err) {
+    res.sendStatus(401)
+  }
+
+})
+
+app.get('/home/', async (req, res) => {
+  const feed = await Post.find();
+  
+  var keys = [];
+
+  for (var i = 0; i < feed.length; i++) {
+    keys.push(feed[i].imageKey)
+  }
+  res.send({keys: keys})
 })
 
 app.listen(port, () => {
