@@ -11,13 +11,12 @@ import multer from 'multer'
 import { uploadFile, getFileStream } from './s3.js'
 import fs from 'fs'
 import util from 'util'
+import getDate from './utils/getDate.js'
 
-const unlinkFile = util.promisify(fs.unlink)
 
-
+// MongoDB connection configuration
 const dbUser = process.env.MONGO_DB_USER
 const dbPass = process.env.MONGO_DB_PASSWORD
-
 const uri = `mongodb+srv://${dbUser}:${dbPass}@cluster0.alr3n8g.mongodb.net/?retryWrites=true&w=majority`
 mongoose.connect(uri)
 
@@ -27,11 +26,13 @@ app.use(cors({
   methods: 'GET, POST, PUT, DELETE', // Specify the allowed HTTP methods
   allowedHeaders: 'Content-Type, Authorization'
 }));
+///////////////////////////////////////
 
+// Express configuration
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 const port = 3001;
-
+///////////////////////////////////////
 app.get('/', (req, res) => {
   const response = {
     greeting: "Hello"
@@ -98,6 +99,9 @@ app.get('/profile', async (req, res) => {
       username: dt.username,
       bio: dt.bio,
     }
+    const userPosts = await Post.find({ userId: user.id })
+    console.log(userPosts)
+    res.send({username: user.username, userPosts: userPosts})
   } catch (err) {
     res.sendStatus(401)
   }
@@ -105,6 +109,7 @@ app.get('/profile', async (req, res) => {
 //upload logic
 
 const upload = multer({ dest: 'post/' })
+const unlinkFile = util.promisify(fs.unlink)
 
 app.post('/upload', upload.single('image'), async (req, res) => {
   const file = req.file
@@ -113,6 +118,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   await unlinkFile(file.path)
 
   const token = req.headers.authorization.split(' ')[1]
+
+
 
   try {
     const dt = jwt.verify(token, process.env.JWT_SECRET)
@@ -125,28 +132,27 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       id: uuidv4(),
       userId: user.id,
       username: user.username,
-      imageKey: result.Key, 
+      imageKey: result.Key,
       caption: "",
+      postDate: getDate(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
-
     })
     await post.save();
   } catch (err) {
     res.sendStatus(401)
   }
-
 })
 
 app.get('/home/', async (req, res) => {
   const feed = await Post.find();
-  
-  var keys = [];
+  const newFeed = feed.reverse();
 
-  for (var i = 0; i < feed.length; i++) {
-    keys.push(feed[i].imageKey)
+  var photos = [];
+  for (var i = 0; i < newFeed.length; i++) {
+    photos.push({ imageKey: newFeed[i].imageKey, userName: newFeed[i].username, postedAt: newFeed[i].postDate })
   }
-  res.send({keys: keys})
+  res.send({ photos: photos })
 })
 
 app.listen(port, () => {
