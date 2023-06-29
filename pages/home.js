@@ -28,7 +28,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-orange-200">
+    <div className="bg-black text-slate-100">
       {/* Top Navbar  */}
 
       <nav className="flex bg-black opacity-90 justify-between items-center px-4 h-16 z-10 relative">
@@ -62,8 +62,7 @@ const Home = () => {
             photo={photo.imageKey}
             username={photo.userName}
             date={photo.postedAt}
-            key={index}
-            className="opacity-100"
+            key={index}  
           />
         ))}
       </div>

@@ -13,7 +13,7 @@ const PostCard = (props) => {
       </div>
       <div className="bg-red-400 h-156 w-72 border-4 border-lime-500 ">
         <img
-          className="h-full w-full relative"
+          className="h-full w-full object-cover object-center  relative"
           src={`https://inner-circle-project.s3.us-west-2.amazonaws.com/${props.photo}`}
           id={props.index}
         />

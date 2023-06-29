@@ -4,9 +4,12 @@ import Navbar from "@/components/navbar";
 import Link from "next/link";
 import Image from "next/image";
 import Gallery from "@/components/gallery";
+import { set } from "mongoose";
 
 const Profile = () => {
   const [profile, setProfile] = useState({});
+  const [view, setView] = useState('grid');
+
 
   useEffect(() => {
     async function getProfile() {
@@ -26,6 +29,19 @@ const Profile = () => {
     }
     getProfile();
   }, []);
+
+  const postView = () => {
+
+  const galleryView = "flex flex-row flex-wrap justify-center";
+  const singleView = "w-full";
+    if (view == 'grid') {
+      return galleryView
+    }
+
+    if (view == 'single') {
+      return singleView
+    }
+  }
 
   return (
     <div className="bg-black opacity-90">
@@ -87,7 +103,12 @@ const Profile = () => {
       {/* Photo View Options */}
 
       <ul className="mt-3 flex justify-evenly">
-        <li className="relative flex w-full cursor-pointer items-center justify-center p-4 transition duration-150 ease-in-out hover:opacity-50">
+        <li
+          onClick={() => {
+            setView("grid");
+          }}
+          className="relative flex w-full cursor-pointer items-center justify-center p-4 transition duration-150 ease-in-out hover:opacity-50"
+        >
           <Image
             height={25}
             width={25}
@@ -97,7 +118,12 @@ const Profile = () => {
           />
           {/* <div className="absolute bottom-0 w-14 border-b-[3px] border-lime-500"></div> */}
         </li>
-        <li className="flex w-full cursor-pointer items-center justify-center p-4 transition duration-150 ease-in-out hover:opacity-50 ">
+        <li
+          onClick={() => {
+            setView("single");
+          }}
+          className="flex w-full cursor-pointer items-center justify-center p-4 transition duration-150 ease-in-out hover:opacity-50 "
+        >
           <Image
             height={25}
             width={25}
@@ -119,18 +145,17 @@ const Profile = () => {
       </ul>
 
       {/* User Posts */}
-
-      <div className="bg-gradient-to-b from-slate-100 to-slate-300 flex justify-evenly h-screen">
-        {profile.userPosts?.map((photo, index) => (
-          <Gallery
-            photo={photo}
-            date={photo.postedAt}
-            key={index}
-            className="opacity-100"
-          />
-        ))}
-      </div>
-
+        <div className={postView()}>
+          {profile.userPosts?.map((photo, index) => (
+            <Gallery
+              photo={photo}
+              date={photo.postedAt}
+              key={index}
+              className="opacity-100"
+              view={view}
+            />
+          ))}
+        </div>
       <Navbar />
     </div>
   );
