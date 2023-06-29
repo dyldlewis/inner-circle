@@ -28,7 +28,7 @@ const Navbar = () => {
     input.click();
   }
   return (
-    <div className="flex justify-center sticky bottom-0 w-full bg-black relative z-10">
+    <div className="flex justify-center sticky bottom-0 top-0 w-full bg-black z-10">
       <ul className="mt-3 flex justify-evenly w-full">
         <Link href={"/home"}>
           <li className="flex w-full cursor-pointer items-center justify-center p-4 hover:opacity-50">

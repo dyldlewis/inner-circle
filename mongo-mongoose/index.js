@@ -101,10 +101,35 @@ app.get('/profile', async (req, res) => {
     }
     const userPosts = await Post.find({ userId: user.id })
     console.log(userPosts)
-    res.send({username: user.username, userPosts: userPosts})
+    res.send({ username: user.username, userPosts: userPosts, bio: user.bio })
   } catch (err) {
     res.sendStatus(401)
   }
+})
+
+
+app.post('/bio', async (req, res) => {
+
+  const token = req.headers.authorization.split(' ')[1]
+  const newBio = req.body.bio
+  try {
+    const dt = jwt.verify(token, process.env.JWT_SECRET)
+    const user = {
+      id: dt.id,
+    }
+    const userBio = await User.updateOne(
+      { id: user.id },
+      { $set: { bio: newBio } }
+    );
+  } catch (error) {
+    console.log('error updating bio')
+  }
+
+
+  res.send('bio saved successfully')
+
+
+
 })
 //upload logic
 

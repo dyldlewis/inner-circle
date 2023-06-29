@@ -9,7 +9,7 @@ import { set } from "mongoose";
 const Profile = () => {
   const [profile, setProfile] = useState({});
   const [view, setView] = useState('grid');
-
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     async function getProfile() {
@@ -32,8 +32,8 @@ const Profile = () => {
 
   const postView = () => {
 
-  const galleryView = "flex flex-row flex-wrap justify-center";
-  const singleView = "w-full";
+    const galleryView = "flex flex-row flex-wrap justify-center min-h-screen";
+    const singleView = "w-full";
     if (view == 'grid') {
       return galleryView
     }
@@ -43,8 +43,46 @@ const Profile = () => {
     }
   }
 
+  const toggleEdit = () => {
+
+    setIsEditing(!isEditing)
+
+  }
+
+  const handleBioChange = (event) => {
+
+    setProfile({ ...profile, bio: event.target.value })
+  }
+
+  const saveProfile = async () => {
+    const jwt = localStorage.getItem("jwt");
+    const formattedJwt = `Bearer ${jwt}`;
+
+    try {
+      const response = await fetch("http://localhost:3001/bio", {
+        method: "POST",
+        headers: {
+          Authorization: formattedJwt,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ bio: profile.bio }),
+      });
+
+      if (response.ok) {
+
+        setIsEditing(false);
+      } else {
+        throw new Error("Profile update failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
+
   return (
-    <div className="bg-black opacity-90">
+    <div className="bg-black opacity-90 min-h-screen">
       <nav className="flex justify-between items-center px-4 h-16">
         <h1 className="text-slate-100 text-xl">{profile.username}</h1>
         <div className="flex w-full justify-end items-center stroke-red stroke-2">
@@ -92,13 +130,22 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="px-4 mt-4 text-slate-100 lg:text-lg">
-        <span>
-          Hey I like riding my skateboard n shit taking pictures of the sun and
-          its reflections and light n shit. Worked at national geographic 5
-          years.
-        </span>
-      </div>
+      {isEditing ? (
+
+        <div className="flex justify-start ml-4"> <textarea className="border-2 border-lime-500 p-4 resize-none bg-black w-full opacity-90 text-slate-100" value={profile.bio} onChange={handleBioChange} /> <img onClick={isEditing ? saveProfile : toggleEdit} src="/edit.svg" className="h-6 w-6 mx-4 inline" /> </div>) : (
+        <div className="px-4 mt-4  text-slate-100 lg:text-lg">
+          <span>
+            {profile.bio}<img onClick={isEditing ? saveProfile : toggleEdit} src="/edit.svg" className="h-4 w-4 mx-4 inline" />
+          </span>
+
+
+
+        </div>
+      )
+
+      }
+
+
 
       {/* Photo View Options */}
 
@@ -145,17 +192,17 @@ const Profile = () => {
       </ul>
 
       {/* User Posts */}
-        <div className={postView()}>
-          {profile.userPosts?.map((photo, index) => (
-            <Gallery
-              photo={photo}
-              date={photo.postedAt}
-              key={index}
-              className="opacity-100"
-              view={view}
-            />
-          ))}
-        </div>
+      <div className={postView()}>
+        {profile.userPosts?.map((photo, index) => (
+          <Gallery
+            photo={photo}
+            date={photo.postedAt}
+            key={index}
+            className="opacity-100"
+            view={view}
+          />
+        ))}
+      </div>
       <Navbar />
     </div>
   );

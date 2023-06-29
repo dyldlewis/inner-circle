@@ -28,10 +28,10 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-black text-slate-100">
+    <div className=" text-slate-100 bg-black opacity-90">
       {/* Top Navbar  */}
 
-      <nav className="flex bg-black opacity-90 justify-between items-center px-4 h-16 z-10 relative">
+      <nav className="flex justify-between items-center px-4 h-16 z-10 relative">
         <h1 className="text-slate-100 text-xl">InnerCircle</h1>
 
         <div className="flex w-full justify-end items-center stroke-red stroke-2">
@@ -56,13 +56,13 @@ const Home = () => {
           </Link>
         </div>
       </nav>
-      <div className="relative z-10">
+      <div className=" z-10 ">
         {feed.map((photo, index) => (
           <PostCard
             photo={photo.imageKey}
             username={photo.userName}
             date={photo.postedAt}
-            key={index}  
+            key={index}
           />
         ))}
       </div>
