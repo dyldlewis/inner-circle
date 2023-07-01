@@ -12,6 +12,7 @@ import { uploadFile, getFileStream } from './s3.js'
 import fs from 'fs'
 import util from 'util'
 import getDate from './utils/getDate.js'
+import { requireAuth } from './auth/requireAuth.js'
 
 
 // MongoDB connection configuration
@@ -41,10 +42,8 @@ app.get('/', (req, res) => {
 })
 
 app.post('/sign-up', async (req, res) => {
-
   const password = req.body.password
   const username = req.body.email
-
   const saltRounds = 10
   const salt = await bcrypt.genSalt(saltRounds)
   const hashedPassword = await bcrypt.hash(password, salt)
@@ -54,8 +53,8 @@ app.post('/sign-up', async (req, res) => {
     username: username,
     password: hashedPassword,
     bio: "",
+    pfp: ""
   })
-
   const result = {
     serverStatus: "user has been created"
   }
@@ -64,10 +63,8 @@ app.post('/sign-up', async (req, res) => {
 })
 
 app.post('/authenticate', async (req, res) => {
-
   const password = req.body.password
   const username = req.body.email
-
   const user = await User.findOne({ username: username })
 
   if (user) {
@@ -90,69 +87,43 @@ app.post('/authenticate', async (req, res) => {
   }
 })
 
-app.get('/profile', async (req, res) => {
-  const token = req.headers.authorization.split(' ')[1]
+app.get('/profile', requireAuth, async (req, res) => {
   try {
-    const dt = jwt.verify(token, process.env.JWT_SECRET)
-    const user = {
-      id: dt.id,
-      username: dt.username,
-      bio: dt.bio,
-    }
-    const userPosts = await Post.find({ userId: user.id })
-    console.log(userPosts)
-    res.send({ username: user.username, userPosts: userPosts, bio: user.bio })
+    const userId = req.decodedToken.id
+    const profile = await User.findOne({ id: userId })
+    const userPosts = await Post.find({ userId: userId })
+    res.send({ username: profile.username, userPosts: userPosts.reverse(), bio: profile.bio, pfp: profile.pfp })
   } catch (err) {
     res.sendStatus(401)
   }
 })
 
 
-app.post('/bio', async (req, res) => {
-
-  const token = req.headers.authorization.split(' ')[1]
+app.post('/bio', requireAuth, async (req, res) => {
   const newBio = req.body.bio
   try {
-    const dt = jwt.verify(token, process.env.JWT_SECRET)
-    const user = {
-      id: dt.id,
-    }
     const userBio = await User.updateOne(
-      { id: user.id },
+      { id: req.decodedToken.id },
       { $set: { bio: newBio } }
     );
   } catch (error) {
     console.log('error updating bio')
   }
-
-
   res.send('bio saved successfully')
-
-
-
 })
 //upload logic
 
 const upload = multer({ dest: 'post/' })
 const unlinkFile = util.promisify(fs.unlink)
 
-app.post('/upload', upload.single('image'), async (req, res) => {
+app.post('/upload', requireAuth, upload.single('image'), async (req, res) => {
   const file = req.file
   const result = await uploadFile(file)
   console.log(result)
   await unlinkFile(file.path)
 
-  const token = req.headers.authorization.split(' ')[1]
-
-
-
   try {
-    const dt = jwt.verify(token, process.env.JWT_SECRET)
-    const user = {
-      id: dt.id,
-      username: dt.username,
-      bio: dt.bio,
-    }
+    const user = req.decodedToken
     const post = new Post({
       id: uuidv4(),
       userId: user.id,
@@ -169,10 +140,22 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   }
 })
 
+app.post('/pfp', requireAuth, upload.single('image'), async (req, res) => {
+  const file = req.file
+  const result = await uploadFile(file)
+  console.log(result)
+  await unlinkFile(file.path)
+  try {
+    const user = req.decodedToken
+    const pfpUpdate = await User.updateOne({ id: user.id }, { $set: { pfp: result.Key } })
+  } catch (err) {
+    res.sendStatus(401)
+  }
+})
+
 app.get('/home/', async (req, res) => {
   const feed = await Post.find();
   const newFeed = feed.reverse();
-
   var photos = [];
   for (var i = 0; i < newFeed.length; i++) {
     photos.push({ imageKey: newFeed[i].imageKey, userName: newFeed[i].username, postedAt: newFeed[i].postDate })

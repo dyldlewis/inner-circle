@@ -7,6 +7,7 @@ const userSchema = new Schema({
 	username: String,
 	password: String,
 	bio: String,
+	pfp: String,
 	createdAt: Date,
 	updatedAt: Date,
 })
