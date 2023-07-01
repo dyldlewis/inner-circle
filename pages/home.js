@@ -5,6 +5,9 @@ import Navbar from "@/components/navbar";
 import Link from "next/link";
 import Image from "next/image";
 import PostCard from "@/components/postcard";
+import TopNav from "@/components/topnav";
+import { getJwt } from "../auth"
+import withAuth from "../auth/withAuth.js"
 
 const Home = () => {
   const [feed, setFeed] = useState([]);
@@ -29,34 +32,9 @@ const Home = () => {
 
   return (
     <div className=" text-slate-100 bg-black opacity-90">
-      {/* Top Navbar  */}
+      <TopNav navName={"InnerCircle"}/>
 
-      <nav className="flex justify-between items-center px-4 h-16 z-10 relative">
-        <h1 className="text-slate-100 text-xl">InnerCircle</h1>
-
-        <div className="flex w-full justify-end items-center stroke-red stroke-2">
-          <Link href={"/"}>
-            <Image
-              src={"/bell.svg"}
-              height={25}
-              width={25}
-              className="h-10 w-10 mx-4 hover:opacity-50"
-              alt="notification icon"
-              priority
-            />
-          </Link>
-          <Link href={"/"} passHref>
-            <Image
-              src={"/settings.svg"}
-              height={25}
-              width={25}
-              className="h-10 w-10 hover:opacity-50"
-              alt="settings icon"
-            />
-          </Link>
-        </div>
-      </nav>
-      <div className=" z-10 ">
+      <div className="relative z-10">
         {feed.map((photo, index) => (
           <PostCard
             photo={photo.imageKey}
@@ -79,4 +57,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withAuth(Home);

@@ -11,9 +11,9 @@ const PostCard = (props) => {
         <div className="mx-2 text-lg">{props.username}</div>
         <div className="ml-auto mx-2 text-lg">{props.date}</div>
       </div>
-      <div className="bg-red-400 h-156 w-72 border-4 border-lime-500 ">
+      <div className="bg-red-400 w-2/3 border-4 border-lime-500 ">
         <img
-          className="h-full w-full object-cover object-center  relative"
+          className="h-full w-full  relative"
           src={`https://inner-circle-project.s3.us-west-2.amazonaws.com/${props.photo}`}
           id={props.index}
         />

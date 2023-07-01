@@ -3,8 +3,12 @@
 import './globals.css'
 import Link from "next/link";
 import React, { useState } from 'react'
+import { getJwt } from "../auth"
 
 export default function Login() {
+  if (getJwt() != null) {
+    window.location.replace("/profile")
+  }
 
   const sendCredentials = async (e) => {
     e.preventDefault()
@@ -21,7 +25,6 @@ export default function Login() {
     result = await result.json();
     console.warn(result)
     if (result) {
-      alert("User has been authenticated")
       setEmail("")
       setPassword("")
       localStorage.setItem('jwt', result.token)
