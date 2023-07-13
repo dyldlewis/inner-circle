@@ -2,11 +2,8 @@
 import "./globals.css";
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
-import Link from "next/link";
-import Image from "next/image";
 import PostCard from "@/components/postcard";
 import TopNav from "@/components/topnav";
-import { getJwt } from "../auth"
 import withAuth from "../auth/withAuth.js"
 
 const Home = () => {
@@ -38,6 +35,7 @@ const Home = () => {
         {feed.map((photo, index) => (
           <PostCard
             photo={photo.imageKey}
+            caption={photo.caption}
             username={photo.userName}
             date={photo.postedAt}
             key={index}
