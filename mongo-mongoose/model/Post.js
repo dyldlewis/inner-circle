@@ -8,6 +8,7 @@ const postSchema = new Schema({
 	imageKey: String,
 	username: String,
 	caption: String,
+	likes: Array,
 	postDate: String,
 	createdAt: Date,
 	updatedAt: Date,
