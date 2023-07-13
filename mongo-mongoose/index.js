@@ -119,7 +119,6 @@ const unlinkFile = util.promisify(fs.unlink)
 app.post('/upload', requireAuth, upload.single('image'), async (req, res) => {
   const file = req.file
   const result = await uploadFile(file)
-  console.log(result)
   await unlinkFile(file.path)
 
   try {
@@ -129,7 +128,7 @@ app.post('/upload', requireAuth, upload.single('image'), async (req, res) => {
       userId: user.id,
       username: user.username,
       imageKey: result.Key,
-      caption: "",
+      caption: req.body.alt,
       postDate: getDate(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -138,6 +137,7 @@ app.post('/upload', requireAuth, upload.single('image'), async (req, res) => {
   } catch (err) {
     res.sendStatus(401)
   }
+  res.send("Upload Successful")
 })
 
 app.post('/pfp', requireAuth, upload.single('image'), async (req, res) => {
@@ -158,7 +158,7 @@ app.get('/home/', async (req, res) => {
   const newFeed = feed.reverse();
   var photos = [];
   for (var i = 0; i < newFeed.length; i++) {
-    photos.push({ imageKey: newFeed[i].imageKey, userName: newFeed[i].username, postedAt: newFeed[i].postDate })
+    photos.push({ imageKey: newFeed[i].imageKey, userName: newFeed[i].username, postedAt: newFeed[i].postDate, caption: newFeed[i].caption })
   }
   res.send({ photos: photos })
 })
