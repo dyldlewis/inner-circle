@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import PostCard from "@/components/postcard";
 import TopNav from "@/components/topnav";
-import withAuth from "../auth/withAuth.js"
+import withAuth from "../auth/withAuth.js";
 
 const Home = () => {
   const [feed, setFeed] = useState([]);
@@ -14,7 +14,6 @@ const Home = () => {
       method: "get",
     });
     result = await result.json();
-    console.log(result);
     const keyResults = result.photos;
     return keyResults;
   };
@@ -29,7 +28,7 @@ const Home = () => {
 
   return (
     <div className=" text-slate-100 bg-black opacity-90">
-      <TopNav navName={"InnerCircle"}/>
+      <TopNav navName={"InnerCircle"} />
 
       <div className="relative z-10">
         {feed.map((photo, index) => (
@@ -39,6 +38,9 @@ const Home = () => {
             username={photo.userName}
             date={photo.postedAt}
             key={index}
+            pfp={photo.pfp}
+            id={photo.id}
+            likes={photo.likes}
           />
         ))}
       </div>

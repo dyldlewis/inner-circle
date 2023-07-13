@@ -38,7 +38,7 @@ const ImagePreview = () => {
 
   return (
     <div className="text-slate-100">
-      <label for="fileInput" className="file-input-label">
+      <label htmlFor="fileInput" className="file-input-label">
         <img className="h-10 w-10 cursor-pointer" src="/plus.svg" />
       </label>
       <input
