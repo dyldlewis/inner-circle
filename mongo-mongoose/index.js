@@ -214,19 +214,35 @@ app.get("/home/", async (req, res) => {
 app.post("/likePost", requireAuth, async (req, res) => {
   console.log(req.body)
   const likedPost = req.body.post;
-  try {
-    const likePost = await Post.updateOne(
-      { id: likedPost.id },
-      { $push: { likes: req.decodedToken.id } }
-    );
-    const addLikeToUser = User.updateOne(
-      { id: req.decodedToken.id },
-      { $push: { likes: likedPost.id } }
-    )
-  } catch (error) {
-    console.log("Error liking photo");
+  if (req.body.action === false) {
+    try {
+      const likePost = await Post.updateOne(
+        { id: likedPost.id },
+        { $push: { likes: req.decodedToken.id } }
+      );
+      const addLikeToUser = User.updateOne(
+        { id: req.decodedToken.id },
+        { $push: { likes: likedPost.id } }
+      )
+    } catch (error) {
+      console.log("Error liking photo");
+    }
+  } else {
+    try {
+      const unlikePost = await Post.updateOne(
+        { id: likedPost.id },
+        { $pull: { likes: req.decodedToken.id } }
+      );
+      const deleteLikeToUser = User.updateOne(
+        { id: req.decodedToken.id },
+        { $pull: { likes: likedPost.id } }
+      )
+    } catch (error) {
+      console.log("Error deleting like");
+    }
+    console.log(likedPost)
   }
-  console.log(likedPost)
+
 
   res.send("Photo successfully liked");
 })

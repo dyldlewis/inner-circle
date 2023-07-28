@@ -24,9 +24,10 @@ const PostCard = (props) => {
 
   const likePost = async () => {
     setLiked(!liked)
+    
     let result = await fetch("http://localhost:3001/likePost", {
       method: "post",
-      body: JSON.stringify({ post: { id: props.id } }),
+      body: JSON.stringify({ post: { id: props.id }, action: liked }),
       headers: {
         Authorization: getJwt(),
         "Content-Type": "application/json"
