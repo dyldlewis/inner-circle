@@ -59,7 +59,8 @@ const PostCard = (props) => {
       if (response.ok) {
         setIsEditing(false);
       } else {
-        throw new Error("Profile update failed");
+        throw new Error("Comment update failed");
+
       }
     } catch (error) {
       console.error("Error:", error);
@@ -106,17 +107,16 @@ const PostCard = (props) => {
         </div>
       </div>
       { isEditing && 
-        <div className="flex justify-start ml-4">
-          {" "}
+        <div className="w-2/3 flex h-12 mb-2"> 
           <textarea
-            className="border-2 border-lime-500 p-4 resize-none bg-black w-full opacity-90 text-slate-100"
+            className="border-2 border-lime-500 mx-2 px-2 resize-none bg-black w-full opacity-90 text-slate-100"
             onChange={(e) => setComment(e.target.value)}
-          />{" "}
+          />
         </div>
       }
-      <div>
+      <div className="w-2/3 px-2">
         {props.comments.map((comment, index) => (
-          <p>{comment.text}</p>
+          <p key={index}>{comment.text}</p>
         ))}
       </div>
 

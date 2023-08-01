@@ -46,6 +46,7 @@ const Home = () => {
         ))}
       </div>
       <img
+
         className="fixed top-0 right-0 opacity-70 h-80 w-80 z-0"
         src="/vine.png"
       />
