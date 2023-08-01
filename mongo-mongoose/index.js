@@ -179,6 +179,14 @@ app.get("/home/", async (req, res) => {
       $unwind: "$userDetails",
     },
     {
+      $lookup: {
+        from: "comments",
+        localField: "id",        // Assuming "id" in the "Post" collection refers to the photoId
+        foreignField: "photoId", // Assuming "photoId" in the "comments" collection represents the post's photoId
+        as: "comments",
+      },
+    },
+    {
       $project: {
         _id: 0,
         id: 1,
@@ -192,11 +200,13 @@ app.get("/home/", async (req, res) => {
         updatedAt: 1,
         __v: 1,
         pfp: "$userDetails.pfp",
+        comments: 1
       },
     },
   ]);
 
   const newFeed = feed.reverse();
+  console.log(feed)
   var photos = [];
   for (var i = 0; i < newFeed.length; i++) {
     photos.push({
@@ -206,8 +216,10 @@ app.get("/home/", async (req, res) => {
       caption: newFeed[i].caption,
       pfp: newFeed[i].pfp,
       id: newFeed[i].id,
-      likes: newFeed[i].likes
+      likes: newFeed[i].likes,
+      comments: newFeed[i].comments
     });
+    console.log(newFeed[i].comments)
   }
   res.send({ photos: photos });
 });
@@ -248,7 +260,7 @@ app.post("/likePost", requireAuth, async (req, res) => {
   res.send("Photo successfully liked");
 })
 
-app.post("/comment", requireAuth, async (req,res) => {
+app.post("/comment", requireAuth, async (req, res) => {
   const user = req.decodedToken
   try {
     const comment = new Comment({

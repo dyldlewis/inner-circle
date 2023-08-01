@@ -114,6 +114,11 @@ const PostCard = (props) => {
           />{" "}
         </div>
       }
+      <div>
+        {props.comments.map((comment, index) => (
+          <p>{comment.text}</p>
+        ))}
+      </div>
 
     </div>
   );

@@ -41,6 +41,7 @@ const Home = () => {
             pfp={photo.pfp}
             id={photo.id}
             likes={photo.likes}
+            comments={photo.comments}
           />
         ))}
       </div>
