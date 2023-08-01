@@ -4,6 +4,8 @@ import { getJwt } from '/auth'
 const PostCard = (props) => {
   const [showCaption, setShowCaption] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [comment, setComment] = useState("")
   console.log(props)
 
   const showTruncate = () => {
@@ -12,6 +14,10 @@ const PostCard = (props) => {
     }
     const truncate = "truncate max-w-sm overflow-hidden ";
     return truncate;
+  };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
   };
 
   const showLiked = () => {
@@ -24,7 +30,7 @@ const PostCard = (props) => {
 
   const likePost = async () => {
     setLiked(!liked)
-    
+
     let result = await fetch("http://localhost:3001/likePost", {
       method: "post",
       body: JSON.stringify({ post: { id: props.id }, action: liked }),
@@ -36,6 +42,29 @@ const PostCard = (props) => {
       console.log(response);
     });
   }
+
+  const sendComment = async () => {
+    const jwt = getJwt()
+
+    try {
+      const response = await fetch("http://localhost:3001/comment", {
+        method: "POST",
+        headers: {
+          Authorization: jwt,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ comment: comment, id: props.id }),
+      });
+
+      if (response.ok) {
+        setIsEditing(false);
+      } else {
+        throw new Error("Profile update failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
 
   return (
@@ -73,9 +102,19 @@ const PostCard = (props) => {
               }`}
             src={showLiked().likeIcon}
           />
-          <img className="h-6 w-6 hover:cursor-pointer" src="/comment.svg" />
+          <img onClick={isEditing ? sendComment: toggleEdit} className="h-6 w-6 hover:cursor-pointer" src="/comment.svg" />
         </div>
       </div>
+      { isEditing && 
+        <div className="flex justify-start ml-4">
+          {" "}
+          <textarea
+            className="border-2 border-lime-500 p-4 resize-none bg-black w-full opacity-90 text-slate-100"
+            onChange={(e) => setComment(e.target.value)}
+          />{" "}
+        </div>
+      }
+
     </div>
   );
 };

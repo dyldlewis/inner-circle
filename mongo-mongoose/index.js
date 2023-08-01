@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import User from "./model/User.js";
 import Post from "./model/Post.js";
+import Comment from "./model/Comment.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
@@ -245,6 +246,29 @@ app.post("/likePost", requireAuth, async (req, res) => {
 
 
   res.send("Photo successfully liked");
+})
+
+app.post("/comment", requireAuth, async (req,res) => {
+  const user = req.decodedToken
+  try {
+    const comment = new Comment({
+      id: uuidv4(),
+      userId: user.id,
+      username: user.username,
+      text: req.body.comment,
+      photoId: req.body.id,
+      postDate: getDate(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    await comment.save();
+  } catch (err) {
+    console.log(err)
+  }
+
+  console.log(req.body)
+
+  res.send("you got me!")
 })
 
 app.listen(port, () => {
