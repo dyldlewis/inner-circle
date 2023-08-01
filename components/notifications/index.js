@@ -15,7 +15,7 @@ const Notifications = () => {
 			/>
 
 			{isToggled && (
-				<div className="absolute top-14 right-0 w-72 h-96 bg-black border-2 border-lime-600 rounded-sm text-center">
+				<div className="absolute top-14 right-0 w-72 h-96 bg-black border-2 border-lime-600 rounded-md text-center">
 
 					<div className="py-2"><span className="text-slate-100 text-lg">Notifications</span></div>
 				</div>

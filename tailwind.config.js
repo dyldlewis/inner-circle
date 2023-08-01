@@ -8,6 +8,7 @@ module.exports = {
 
   theme: {
     extend: {
+
       animation: {
         "pulse-red": "pulse-red 2s",
       },
